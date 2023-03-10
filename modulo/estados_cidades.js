@@ -22592,7 +22592,6 @@ const getCapitalPais = function(){
 
 // console.log(getCapitalPais())
 
-
 const getCidades = function(siglas){
    let listaJSON = {}
    let listaArray = []
@@ -22614,4 +22613,13 @@ const getCidades = function(siglas){
    return listaJSON
 }
 
-console.log(getCidades('AC'))
+// console.log(getCidades('AC'))
+
+module.exports = {
+   getListaDeEstados,
+   getDadosEstados,
+   getCapitalEstado,
+   getEstadosRegiao,
+   getCapitalPais,
+   getCidades
+}
