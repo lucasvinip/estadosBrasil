@@ -26,10 +26,13 @@ const cors = require('cors')
 //responsavel pela manipulacao do body da requisiçao
 const bodyParser = require('body-parser')
 
+// import do arquivo de funcoes
+const estadosCidades = require('./modulo/estados_cidades.js')
 
 //cria um objeto com as informaçoes da classe express
 const app = express()
 
+//Defini as premissoes no hearder da API
 app.use((request, response, next) =>{
     /* Permite gerenciar a origem das requisiçoes
        * - significa que a API sera publica
@@ -51,13 +54,79 @@ app.use((request, response, next) =>{
 //endPoint para Listar os Estados
 app.get('/estados', cors(), async function(request, response, next){
 
-    const estadosCidades = require('./modulo/estados_cidades.js')
-
+    // chama a funcao que retorna os estados
     let listaDeEstados = estadosCidades.getListaDeEstados()
+    
+    // Tratamento para validar se a funcao realizou o processamento
+    if(listaDeEstados){
+        // retorna o Json e o Status code
+        response.json(listaDeEstados)
+        response.status(200)
+    }
+    else{
+        response.status(500)
+    }
 
-    response.json(listaDeEstados)
-    response.status(200)
+    
 
+})
+
+//endPoint para as caracteristicas do estado pela sigla
+app.get('/estado/sigla/:uf', cors(), async function(request, response, next){
+   
+    //:uf - é uma variael que sera utilizada para passagens de valores, na URL da requisiçao
+
+    // recebe o valor da variavel uf, que sera encaminhada na url da requisiçao
+    let siglaEstado = request.params.uf
+    let statusCode
+    let dadosEstado = {}
+
+    // Tratamento para valida encaminhados no parametro
+    if(siglaEstado == '' || siglaEstado == undefined || siglaEstado.length != 2 || !isNaN(siglaEstado)){
+        statusCode = 400
+        dadosEstado.message =  'Não é possivel processar a requisição a sliga esta errada'
+    }
+    else{
+        //chama a funcao que filtra o estado na sliga
+        let estado = estadosCidades.getDadosEstado(siglaEstado)
+        
+        //Validar se houve retorno valido da funcao
+        if(estado){
+            statusCode = 200 // estado encontrado
+            dadosEstado = estado
+        }
+        else
+            statusCode = 404// estado nao encontrado
+    }
+
+    response.status(statusCode)
+    response.json(dadosEstado)
+})
+
+//endPoint para as capitais do estado pela sigla
+app.get('/estado/capital/sigla/:uf', cors(), async function(request, response, next){
+
+    let siglaEstado = request.params.uf
+    let statusCode
+    let dadosEstado = {}
+
+    if(siglaEstado == '' || siglaEstado == undefined || siglaEstado.length != 2 || !isNaN(siglaEstado)){
+        statusCode = 400
+        dadosEstado.message =  'Não é possivel processar a requisição a sliga esta errada'
+    }
+    else{
+        let estado = estadosCidades.getCapitalEstado(siglaEstado)
+        
+        if(estado){
+            statusCode = 200
+            dadosEstado = estado
+        }
+        else
+        statusCode = 404
+    }
+
+    response.status(statusCode)
+    response.json(dadosEstado)
 })
 
 /*

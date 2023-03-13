@@ -22511,8 +22511,9 @@ const getListaDeEstados = function(){
 // console.log(getListaDeEstados)
 // getListaDeEstados()
 
-const getDadosEstados = function(siglas){
+const getDadosEstado = function(siglas){
    let listaJSON = {}
+   
    
 
    estadosCidades.estados.forEach(function(dados){
@@ -22536,7 +22537,7 @@ const getCapitalEstado = function(siglas){
    let listaJSON = {}
 
    estadosCidades.estados.forEach(function(dados){
-   if(dados.sigla.indexOf(sigla) >= 0 ){
+   if(dados.sigla.indexOf(siglas) >= 0 ){
          listaJSON.uf = dados.sigla
          listaJSON.descricao = dados.nome
          listaJSON.capital = dados.capital
@@ -22617,7 +22618,7 @@ const getCidades = function(siglas){
 
 module.exports = {
    getListaDeEstados,
-   getDadosEstados,
+   getDadosEstado,
    getCapitalEstado,
    getEstadosRegiao,
    getCapitalPais,
