@@ -52,7 +52,8 @@ app.use((request, response, next) =>{
 //endPoints
 
 //endPoint para Listar os Estados
-app.get('/estados', cors(), async function(request, response, next){
+// boa pratica colocar a versao no endPoint
+app.get('/v1/senai/estados', cors(), async function(request, response, next){
 
     // chama a funcao que retorna os estados
     let listaDeEstados = estadosCidades.getListaDeEstados()
@@ -67,12 +68,11 @@ app.get('/estados', cors(), async function(request, response, next){
         response.status(500)
     }
 
-    
 
 })
 
 //endPoint para as caracteristicas do estado pela sigla
-app.get('/estado/sigla/:uf', cors(), async function(request, response, next){
+app.get('/v1/senai/estado/sigla/:uf', cors(), async function(request, response, next){
    
     //:uf - é uma variael que sera utilizada para passagens de valores, na URL da requisiçao
 
@@ -84,7 +84,7 @@ app.get('/estado/sigla/:uf', cors(), async function(request, response, next){
     // Tratamento para valida encaminhados no parametro
     if(siglaEstado == '' || siglaEstado == undefined || siglaEstado.length != 2 || !isNaN(siglaEstado)){
         statusCode = 400
-        dadosEstado.message =  'Não é possivel processar a requisição a sliga esta errada'
+        dadosEstado.message =  'Não é possivel processar a requisição o paremetro esta errada'
     }
     else{
         //chama a funcao que filtra o estado na sliga
@@ -104,7 +104,7 @@ app.get('/estado/sigla/:uf', cors(), async function(request, response, next){
 })
 
 //endPoint para as capitais do estado pela sigla
-app.get('/estado/capital/sigla/:uf', cors(), async function(request, response, next){
+app.get('/v1/senai/estado/capital/sigla/:uf', cors(), async function(request, response, next){
 
     let siglaEstado = request.params.uf
     let statusCode
@@ -112,7 +112,7 @@ app.get('/estado/capital/sigla/:uf', cors(), async function(request, response, n
 
     if(siglaEstado == '' || siglaEstado == undefined || siglaEstado.length != 2 || !isNaN(siglaEstado)){
         statusCode = 400
-        dadosEstado.message =  'Não é possivel processar a requisição a sliga esta errada'
+        dadosEstado.message =  'Não é possivel processar a requisição o paremetro esta errada'
     }
     else{
         let estado = estadosCidades.getCapitalEstado(siglaEstado)
@@ -122,11 +122,95 @@ app.get('/estado/capital/sigla/:uf', cors(), async function(request, response, n
             dadosEstado = estado
         }
         else
-        statusCode = 404
+            statusCode = 404
     }
 
     response.status(statusCode)
     response.json(dadosEstado)
+})
+
+//endPoint para estado filtrado pela regiao
+app.get('/v1/senai/estado/regiao/:regiao', cors(), async function(request, response, next){
+    
+    let regiao = request.params.regiao
+    let statusCode
+    let dadosRegiao = {}
+
+    if(regiao == '' || regiao == undefined || !isNaN(regiao)){
+        statusCode = 400
+        dadosRegiao.message =  'Não é possivel processar a requisição o paremetro esta errada'
+    }
+    else{
+        let estado = estadosCidades.getEstadosRegiao(regiao)
+
+        if(estado){
+            statusCode = 200
+            dadosRegiao = estado
+        }
+        else
+            statusCode = 404
+    }
+    
+    response.status(statusCode)
+    response.json(dadosRegiao)
+})
+
+//endPoint para Listar as capitais do pais
+app.get('/v1/senai/estado/capital/pais', cors(), async function(request, response, next){
+    
+    let listaCapitalPais = estadosCidades.getCapitalPais()
+    let statusCode
+
+    if(listaCapitalPais){
+        response.json(listaCapitalPais)
+        statusCode = 200
+    }
+    else
+        statusCode = 500
+    
+    response.status(statusCode)
+})
+
+//endPoint Lista de cidades filtrada pela sigla do estado
+app.get('/v1/senai/cidades', cors(), async function(request, response, next){
+
+    /*** Recebe o valor da variavel que sera enviada por QueryString
+     *  Ex: www.uol.com.br?uf=sp
+     *  antes do ponto de interrogaçao '?' é o endereço do site,
+     *  depois do '?' sao varieveis
+     * 
+     *  Diferença entre Query e params
+     *  Usamos query para recebr diversos variaveis para realizar filtros;
+     *  Usamos o params para receber ID (PK), geralmente
+     *      para fazer put, delete e get
+     *
+     */
+    let siglaEstado = request.query.uf
+    let statusCode
+    let dadosEstadoCidades = {}
+
+    if(siglaEstado == '' || siglaEstado == undefined ||siglaEstado.length != 2 || !isNaN(siglaEstado)){
+        statusCode = 400
+        dadosEstadoCidades.message =  'Não é possivel processar a requisição o paremetro esta errada'
+    }
+    else{
+        let cidades = estadosCidades.getCidades(siglaEstado)
+        
+        if(cidades){
+            statusCode = 200
+            dadosEstadoCidades = cidades
+        }
+        else
+            statusCode = 404
+    }
+
+    response.status(statusCode)
+    response.json(dadosEstadoCidades)
+})
+
+//endPoint versao 2 para Listar os Estados com mais detalhes/exemplo
+app.get('/v2/senai/cidades', cors(), async function(request, response, next){
+
 })
 
 /*

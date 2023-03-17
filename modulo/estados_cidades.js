@@ -22563,6 +22563,7 @@ const getEstadosRegiao = function(regiao){
       listaJSON.estados = listaArray
    })
 
+   
    return listaJSON
 }
 // console.log(getEstadosRegiao('Nordeste'))
